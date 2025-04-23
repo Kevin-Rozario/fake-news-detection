@@ -154,7 +154,7 @@ def sidebar():
     )
 
     st.sidebar.markdown("---")
-    st.sidebar.markdown("### Developed by Kevin Rozario")
+    st.sidebar.markdown("### Developed by Kevin Rozario, Chaitanya Rele and Aditya Rathod")
     st.sidebar.markdown("© 2025 - All Rights Reserved")
     
     return sample_true, sample_fake
