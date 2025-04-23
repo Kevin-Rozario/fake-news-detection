@@ -9,7 +9,7 @@ from sklearn.metrics import classification_report
 import re
 import string
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression  # Adding missing import
+from sklearn.linear_model import LogisticRegression  
 
 # Download latest version
 path = kagglehub.dataset_download("jainpooja/fake-news-detection")
@@ -202,6 +202,6 @@ def interactive_testing():
 # Uncomment to run interactive mode
 # interactive_testing()
 
-joblib.dump(LR, "model.pkl")
-joblib.dump(vectorization, "vectorizer.pkl")
-print("Model and vectorizer saved as model.pkl and vectorizer.pkl")
+joblib.dump(LR, "model.jbl")
+joblib.dump(vectorization, "vectorizer.jbl")
+print("Model and vectorizer saved as model.jbl and vectorizer.jbl")

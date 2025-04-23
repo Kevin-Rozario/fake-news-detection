@@ -1,5 +1,7 @@
 import streamlit as st
 import joblib
+import re
+import string
 
 # Set page configuration
 st.set_page_config(
@@ -8,6 +10,43 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# Text preprocessing function
+def wordopt(text):
+    text = text.lower()
+    text = re.sub(r'\[.*?\]', '', text)
+    text = re.sub(r"\W", " ", text)
+    text = re.sub(r'https?://\S+|www\.\S+', '', text)
+    text = re.sub(r'<.*?>+', '', text)
+    text = re.sub(r'[%s]' % re.escape(string.punctuation), '', text)
+    text = re.sub(r'\n', '', text)
+    text = re.sub(r'\w*\d\w*', '', text)
+    return text
+
+# Sample articles for demonstration
+def get_sample_true_article():
+    return """WASHINGTON (Reuters) - The U.S. Department of Justice said on Wednesday it had filed a lawsuit against Apple Inc for monopolizing smartphone markets, in a case that could have far-reaching implications for the tech giant's business model.
+
+The lawsuit, filed in federal court in New Jersey, alleges that Apple has monopolized the smartphone markets through restrictive contracts with app developers and through control of the iOS operating system. It seeks to force Apple to open its App Store to competing apps stores and payment systems.
+
+"No company, no matter how big or successful, is above the law," Attorney General Merrick Garland said in a statement. "We allege that Apple has maintained monopoly power in the smartphone market not simply by creating popular products, but by engaging in a range of anticompetitive conduct."
+
+Apple denied the allegations, saying in a statement that the lawsuit "threatens who we are and the principles that set Apple products apart in fiercely competitive markets."
+
+The case is the latest in a series of legal challenges to the power of big technology companies, following antitrust lawsuits against Alphabet Inc's Google and Meta Platforms Inc."""
+
+def get_sample_fake_article():
+    return """BREAKING: FBI Agents Discover Massive Money Laundering Operation at Biden Family Compound
+
+In a shocking development, FBI agents raided the Biden family compound in Delaware yesterday, uncovering evidence of what one agent called "the largest money laundering operation we've ever seen connected to a political family."
+
+Sources close to the investigation report that agents discovered millions in cash hidden throughout the property, along with documents linking the Biden family to suspicious overseas transactions totaling over $1.5 billion. The documents reportedly show connections to foreign governments and questionable business dealings in Ukraine, China, and Russia.
+
+"This is just the tip of the iceberg," said an anonymous FBI whistleblower. "The American people have no idea how deep this corruption goes."
+
+The White House has remained silent on the matter, refusing to answer questions from reporters. Several media outlets have been ordered not to report on the story by federal officials.
+
+Constitutional scholars are already speculating about the possibility of emergency proceedings that could trigger immediate removal from office if the allegations prove true. Congressional leaders from both parties have reportedly been briefed on the situation and are preparing for unprecedented actions in the coming days."""
 
 # Custom CSS for orange color scheme
 def add_custom_css():
@@ -81,6 +120,10 @@ def sidebar():
         "3. View the prediction and confidence score"
     )
 
+    st.sidebar.markdown("## Sample Articles")
+    sample_true = st.sidebar.button("Load Sample True Article")
+    sample_fake = st.sidebar.button("Load Sample Fake Article")
+
     st.sidebar.markdown("## Tips for best results")
     st.sidebar.info(
         "- Include the full article text\n"
@@ -91,19 +134,34 @@ def sidebar():
     st.sidebar.markdown("---")
     st.sidebar.markdown("### Developed by Kevin Rozario")
     st.sidebar.markdown("© 2025 - All Rights Reserved")
+    
+    return sample_true, sample_fake
 
 # Main application function
 def main():
     header()
-    sidebar()
+    sample_true, sample_fake = sidebar()
 
     # Creating columns for better layout
     col1, col2 = st.columns([2, 1])
 
+    # Initialize or retrieve the text area content
+    if "text_area_content" not in st.session_state:
+        st.session_state.text_area_content = ""
+    
+    # Update text area content if sample buttons are clicked
+    if sample_true:
+        st.session_state.text_area_content = get_sample_true_article()
+    elif sample_fake:
+        st.session_state.text_area_content = get_sample_fake_article()
+
     with col1:
         st.subheader("News Article Analysis")
         st.write("Enter the complete text of the news article you want to analyze:")
-        news_article = st.text_area("Enter article text here", height=250, placeholder="Paste article text here...")
+        news_article = st.text_area("Enter article text here", 
+                                   height=250, 
+                                   placeholder="Paste article text here...",
+                                   value=st.session_state.text_area_content)
 
         analyze_button = st.button("Analyze Article")
 
@@ -115,26 +173,30 @@ def main():
                 with st.spinner("Analyzing article..."):
                     try:
                         # Load the model
-                        model = joblib.load("model.pkl")
-                        print("Model loaded successfully.", model)
+                        model = joblib.load("model.jbl")
+                        print("Model loaded successfully.")
 
-                        # Load the vectorizer (uncomment when files are available)
-                        vectorizer = joblib.load("vectorizer.pkl")
-                        print("Vectorizer loaded successfully.", vectorizer)
+                        # Load the vectorizer
+                        vectorizer = joblib.load("vectorizer.jbl")
+                        print("Vectorizer loaded successfully.")
 
-                        # Transform the input text
-                        transformed_text = vectorizer.transform([news_article])
+                        # Preprocess the input text (same preprocessing as during training)
+                        processed_article = wordopt(news_article)
+
+                        # Transform the preprocessed text
+                        transformed_text = vectorizer.transform([processed_article])
 
                         # Make prediction
                         prediction = model.predict(transformed_text)
                         prediction_proba = model.predict_proba(transformed_text)
 
                         # Display the result with custom styling
+                        # Using correct label mapping: 0 = Fake News, 1 = Real News
                         if prediction[0] == 1:
-                            st.error("#### Verdict: Likely FAKE NEWS")
+                            st.success("#### Verdict: Likely REAL NEWS")
                             confidence = prediction_proba[0][1] * 100
                         else:
-                            st.success("#### Verdict: Likely REAL NEWS")
+                            st.error("#### Verdict: Likely FAKE NEWS")
                             confidence = prediction_proba[0][0] * 100
 
                         st.markdown(f"**Confidence**: {confidence:.2f}%")
@@ -147,10 +209,11 @@ def main():
                         st.info("This analysis is based on patterns found in thousands of news articles. The system analyzes writing style, emotional tone, and content patterns.")
 
                     except FileNotFoundError as e:
-                        st.error(f"Error: One or more required files (model.pkl, vectorizer.pkl) not found. Please ensure these files are in the same directory as the script.")
+                        st.error(f"Error: One or more required files (model.jbl, vectorizer.jbl) not found. Please ensure these files are in the same directory as the script.")
                         print(f"File Not Found Error: {e}")
                     except Exception as e:
                         st.error(f"An error occurred during analysis: {e}")
+                        print(f"Error: {e}")
             else:
                 st.warning("Please enter a news article to analyze.")
         else:
