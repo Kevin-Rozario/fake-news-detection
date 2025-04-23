@@ -117,7 +117,7 @@ metrics_data = {
     "accuracy": accuracy,
     "recall": recall,
     "precision": precision,
-    "f1_score": f1,
+    "f1-score": f1,
     "0": {
         "precision": report_dict["0"]["precision"],
         "recall": report_dict["0"]["recall"],

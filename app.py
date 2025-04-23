@@ -251,10 +251,10 @@ def main():
         report = json.load(f)
         
     metrics = {
-        "Accuracy": float(report["accuracy"]),
-        "Precision": float(report["precision"]),
-        "Recall": float(report["recall"]),
-        "F1-Score": float(report["f1-score"]),
+        "Accuracy": report["accuracy"],
+        "Precision": report["precision"],
+        "Recall": report["recall"],
+        "F1-Score": report["f1-score"],
     }
     
     # Display metrics in columns
@@ -269,10 +269,10 @@ def main():
     # Data from your classification report (these values should be replaced with actual data)
     classification_data = pd.DataFrame({
         'Class': ['Fake News (0)', 'Real News (1)'],
-        'Precision': [float(report[0]["precision"]), float(report[1]["precision"])],
-        'Recall': [float(report[0]["recall"]), float(report[1]["recall"])],
-        'F1-Score': [float(report[0]["f1-score"]), float(report[1]["f1-score"])],
-        'Support': [float(report[0]["support"]), float(report[1]["support"])],
+        'Precision': [report["0"]["precision"], report["1"]["precision"]],
+        'Recall': [report["0"]["recall"], report["1"]["recall"]],
+        'F1-Score': [report["0"]["f1-score"], report["1"]["f1-score"]],
+        'Support': [report["0"]["support"], report["1"]["support"]],
     })
     
     # Melt the dataframe for Altair
