@@ -1,9 +1,5 @@
-from turtle import mode
 import streamlit as st
 import joblib
-import numpy as np
-import pandas as pd
-import streamlit.components.v1 as components
 
 # Set page configuration
 st.set_page_config(
