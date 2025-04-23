@@ -119,10 +119,10 @@ def main():
                 with st.spinner("Analyzing article..."):
                     try:
                         # Load the model
-                        model = joblib.load("model.jb")
+                        model = joblib.load("model.pkl")
                         
                         # Load the vectorizer (uncomment when files are available)
-                        vectorizer = joblib.load("vectorizer.jb")
+                        vectorizer = joblib.load("vectorizer.pkl")
                         
                         # Transform the input text
                         transformed_text = vectorizer.transform([news_article])

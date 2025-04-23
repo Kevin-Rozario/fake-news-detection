@@ -202,6 +202,6 @@ def interactive_testing():
 # Uncomment to run interactive mode
 # interactive_testing()
 
-joblib.dump(LR, "model.jb")
-joblib.dump(vectorization, "vectorizer.jb")
-print("Model and vectorizer saved as model.jb and vectorizer.jb")
+joblib.dump(LR, "model.pkl")
+joblib.dump(vectorization, "vectorizer.pkl")
+print("Model and vectorizer saved as model.pkl and vectorizer.pkl")
