@@ -131,7 +131,6 @@ def sidebar():
     st.sidebar.markdown("## Dataset Distribution")
     
     # Create data for the dataset distribution chart
-    # Values from your training script
     df_distribution = pd.DataFrame({
         'Category': ['Real News', 'Fake News'],
         'Count': [21406, 23480]
@@ -164,8 +163,6 @@ def sidebar():
 def main():
     header()
     sample_true, sample_fake = sidebar()
-
-    # Creating columns for better layout
     col1, col2 = st.columns([2, 1])
 
     # Initialize or retrieve the text area content
@@ -213,7 +210,6 @@ def main():
                         prediction = model.predict(transformed_text)
                         prediction_proba = model.predict_proba(transformed_text)
 
-                        # Display the result with custom styling
                         # Using correct label mapping: 0 = Fake News, 1 = Real News
                         if prediction[0] == 1:
                             st.success("#### Verdict: Likely REAL NEWS")
@@ -242,11 +238,11 @@ def main():
         else:
             st.info("Enter an article and click 'Analyze' to get results.")
 
-    # Model Metrics section - added as per your request
+    # Model Metrics
     st.markdown("---")
     st.subheader("Model Metrics")
     
-    # Load metrics from a file or use static values from the model.py output
+    # Load metrics from a file
     with open("metrics.json", "r") as f:
         report = json.load(f)
         
@@ -266,7 +262,7 @@ def main():
     # Display classification report visualization
     st.subheader("Classification Report")
     
-    # Data from your classification report (these values should be replaced with actual data)
+    # Data from classification report
     classification_data = pd.DataFrame({
         'Class': ['Fake News (0)', 'Real News (1)'],
         'Precision': [report["0"]["precision"], report["1"]["precision"]],
@@ -304,7 +300,7 @@ def main():
         - **F1-Score**: Harmonic mean of precision and recall, balances both metrics
         """)
     
-    # Features section below the main content
+    # Features section
     st.markdown("---")
     st.subheader("How it works")
 
@@ -322,6 +318,6 @@ def main():
         st.markdown("### 🔍 Results")
         st.write("Get instant feedback on the credibility of news articles with confidence scores.")
 
-# Run the application
+
 if __name__ == "__main__":
     main()
