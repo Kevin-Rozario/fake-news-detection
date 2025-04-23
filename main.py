@@ -1,5 +1,6 @@
 import kagglehub
 import pandas as pd
+import joblib
 # import numpy as np
 # import seaborn as sns
 # import matplotlib.pyplot as plt
@@ -100,7 +101,7 @@ LR.fit(xv_train, y_train)
 pred_lr = LR.predict(xv_test)
 
 # Evaluate model
-print(f"Logistic Regression Accuracy: {LR.score(xv_test, y_test)}")
+print(f"\n\nLogistic Regression Accuracy: {LR.score(xv_test, y_test)}")
 print("Classification Report:")
 print(classification_report(y_test, pred_lr))
 
@@ -200,3 +201,7 @@ def interactive_testing():
 
 # Uncomment to run interactive mode
 # interactive_testing()
+
+joblib.dump(LR, "model.jb")
+joblib.dump(vectorization, "vectorizer.jb")
+print("Model and vectorizer saved as model.jb and vectorizer.jb")

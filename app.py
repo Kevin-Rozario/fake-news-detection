@@ -1,5 +1,6 @@
+from turtle import mode
 import streamlit as st
-# import joblib
+import joblib
 import numpy as np
 import pandas as pd
 import streamlit.components.v1 as components
@@ -118,10 +119,10 @@ def main():
                 with st.spinner("Analyzing article..."):
                     try:
                         # Load the model
-                        model = joblib.load("model.pkl")
+                        model = joblib.load("model.jb")
                         
                         # Load the vectorizer (uncomment when files are available)
-                        vectorizer = joblib.load("vectorizer.pkl")
+                        vectorizer = joblib.load("vectorizer.jb")
                         
                         # Transform the input text
                         transformed_text = vectorizer.transform([news_article])
