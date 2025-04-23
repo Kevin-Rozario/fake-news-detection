@@ -73,44 +73,44 @@ def header():
 def sidebar():
     st.sidebar.markdown("## About")
     st.sidebar.info(
-        "This application uses machine learning to analyze and " 
+        "This application uses machine learning to analyze and "
         "classify news articles as potentially real or fake. "
         "The model has been trained on thousands of labeled news articles."
     )
-    
+
     st.sidebar.markdown("## How to use")
     st.sidebar.info(
         "1. Paste your news article in the text area\n"
-        "2. Click the 'Analyze' button\n" 
+        "2. Click the 'Analyze' button\n"
         "3. View the prediction and confidence score"
     )
-    
+
     st.sidebar.markdown("## Tips for best results")
     st.sidebar.info(
         "- Include the full article text\n"
         "- Make sure text is in English\n"
         "- Include headline if available"
     )
-    
+
     st.sidebar.markdown("---")
     st.sidebar.markdown("### Developed by Kevin Rozario")
     st.sidebar.markdown("© 2025 - All Rights Reserved")
 
-# Main application function    
+# Main application function
 def main():
     header()
     sidebar()
-    
+
     # Creating columns for better layout
     col1, col2 = st.columns([2, 1])
-    
+
     with col1:
         st.subheader("News Article Analysis")
         st.write("Enter the complete text of the news article you want to analyze:")
-        news_article = st.text_area("", height=250, placeholder="Paste article text here...")
-        
+        news_article = st.text_area("Enter article text here", height=250, placeholder="Paste article text here...")
+
         analyze_button = st.button("Analyze Article")
-        
+
     with col2:
         st.subheader("Results")
         if analyze_button:
@@ -120,17 +120,19 @@ def main():
                     try:
                         # Load the model
                         model = joblib.load("model.pkl")
-                        
+                        print("Model loaded successfully.", model)
+
                         # Load the vectorizer (uncomment when files are available)
                         vectorizer = joblib.load("vectorizer.pkl")
-                        
+                        print("Vectorizer loaded successfully.", vectorizer)
+
                         # Transform the input text
                         transformed_text = vectorizer.transform([news_article])
-                        
+
                         # Make prediction
                         prediction = model.predict(transformed_text)
                         prediction_proba = model.predict_proba(transformed_text)
-                        
+
                         # Display the result with custom styling
                         if prediction[0] == 1:
                             st.error("#### Verdict: Likely FAKE NEWS")
@@ -138,37 +140,40 @@ def main():
                         else:
                             st.success("#### Verdict: Likely REAL NEWS")
                             confidence = prediction_proba[0][0] * 100
-                        
+
                         st.markdown(f"**Confidence**: {confidence:.2f}%")
-                        
+
                         # Display gauge meter for confidence
                         st.progress(confidence/100)
-                        
+
                         # Show factors that influenced the decision
                         st.subheader("Key Factors")
                         st.info("This analysis is based on patterns found in thousands of news articles. The system analyzes writing style, emotional tone, and content patterns.")
-                        
+
+                    except FileNotFoundError as e:
+                        st.error(f"Error: One or more required files (model.pkl, vectorizer.pkl) not found. Please ensure these files are in the same directory as the script.")
+                        print(f"File Not Found Error: {e}")
                     except Exception as e:
-                        st.error(f"An error occurred during analysis. Please try again.")
+                        st.error(f"An error occurred during analysis: {e}")
             else:
                 st.warning("Please enter a news article to analyze.")
         else:
             st.info("Enter an article and click 'Analyze' to get results.")
-    
+
     # Features section below the main content
     st.markdown("---")
     st.subheader("How it works")
-    
+
     col1, col2, col3 = st.columns(3)
-    
+
     with col1:
         st.markdown("### 📊 Analysis")
         st.write("Our model analyzes article text using natural language processing techniques.")
-    
+
     with col2:
         st.markdown("### 🤖 Machine Learning")
         st.write("Trained on thousands of verified real and fake news articles to identify patterns.")
-    
+
     with col3:
         st.markdown("### 🔍 Results")
         st.write("Get instant feedback on the credibility of news articles with confidence scores.")
