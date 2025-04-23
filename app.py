@@ -4,6 +4,7 @@ import re
 import string
 import pandas as pd
 import altair as alt
+import json
 
 # Set page configuration
 st.set_page_config(
@@ -245,14 +246,15 @@ def main():
     st.markdown("---")
     st.subheader("Model Metrics")
     
-    # Load metrics from a file or use static values from the main.py output
-    # In a production system, these would be stored in a file or database
-    # For now, using the values from your training script output
+    # Load metrics from a file or use static values from the model.py output
+    with open("metrics.json", "r") as f:
+        report = json.load(f)
+        
     metrics = {
-        "Accuracy": 0.927,  # Example value, replace with actual metric
-        "Precision": 0.934,
-        "Recall": 0.919,
-        "F1-Score": 0.926
+        "Accuracy": float(report["accuracy"]),
+        "Precision": float(report["precision"]),
+        "Recall": float(report["recall"]),
+        "F1-Score": float(report["f1-score"]),
     }
     
     # Display metrics in columns
@@ -267,10 +269,10 @@ def main():
     # Data from your classification report (these values should be replaced with actual data)
     classification_data = pd.DataFrame({
         'Class': ['Fake News (0)', 'Real News (1)'],
-        'Precision': [0.94, 0.92],
-        'Recall': [0.91, 0.95],
-        'F1-Score': [0.92, 0.93],
-        'Support': [5000, 5000]  # Example counts
+        'Precision': [float(report[0]["precision"]), float(report[1]["precision"])],
+        'Recall': [float(report[0]["recall"]), float(report[1]["recall"])],
+        'F1-Score': [float(report[0]["f1-score"]), float(report[1]["f1-score"])],
+        'Support': [float(report[0]["support"]), float(report[1]["support"])],
     })
     
     # Melt the dataframe for Altair

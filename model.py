@@ -5,11 +5,12 @@ import joblib
 # import seaborn as sns
 # import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, accuracy_score, recall_score, precision_score, f1_score
 import re
 import string
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression  
+import json
 
 # Download latest version
 path = kagglehub.dataset_download("jainpooja/fake-news-detection")
@@ -104,6 +105,37 @@ pred_lr = LR.predict(xv_test)
 print(f"\n\nLogistic Regression Accuracy: {LR.score(xv_test, y_test)}")
 print("Classification Report:")
 print(classification_report(y_test, pred_lr))
+
+# Save metrics to JSON
+accuracy = accuracy_score(y_test, pred_lr)
+recall = recall_score(y_test, pred_lr)
+precision = precision_score(y_test, pred_lr)
+f1 = f1_score(y_test, pred_lr)
+report_dict = classification_report(y_test, pred_lr, output_dict=True)
+
+metrics_data = {
+    "accuracy": accuracy,
+    "recall": recall,
+    "precision": precision,
+    "f1_score": f1,
+    "0": {
+        "precision": report_dict["0"]["precision"],
+        "recall": report_dict["0"]["recall"],
+        "f1-score": report_dict["0"]["f1-score"],
+        "support": report_dict["0"]["support"]
+    },
+    "1": {
+        "precision": report_dict["1"]["precision"],
+        "recall": report_dict["1"]["recall"],
+        "f1-score": report_dict["1"]["f1-score"],
+        "support": report_dict["1"]["support"]
+    }
+}
+
+# Save metrics to JSON file
+with open("metrics.json", "w") as f:
+    json.dump(metrics_data, f, indent=4)
+print("\nMetrics saved to metrics.json")
 
 # Function to output prediction label
 def output_lable(n):
